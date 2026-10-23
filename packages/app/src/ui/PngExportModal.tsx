@@ -8,8 +8,6 @@ import {
 import { Modal } from "./Modal";
 import css from "./PngExportModal.module.css";
 
-const DEFAULT_FILE_NAME = "tikz-export.png";
-
 let rememberedDpi = "144";
 let rememberedTransparentBackground = true;
 
@@ -32,10 +30,11 @@ type PreviewState =
 
 type PngExportModalProps = {
   svgResult: EmitSvgResult;
+  fileName: string;
   onClose: () => void;
 };
 
-export function PngExportModal({ svgResult, onClose }: PngExportModalProps) {
+export function PngExportModal({ svgResult, fileName, onClose }: PngExportModalProps) {
   const [dpiInput, setDpiInput] = useState(rememberedDpi);
   const [transparentBackground, setTransparentBackground] = useState(rememberedTransparentBackground);
   const [preview, setPreview] = useState<PreviewState>({
@@ -89,7 +88,7 @@ export function PngExportModal({ svgResult, onClose }: PngExportModalProps) {
     void renderPngExport(svgResult, {
       dpi: effectiveDpi,
       transparentBackground,
-      fileName: DEFAULT_FILE_NAME
+      fileName
     }).then(
       (result) => {
         if (!active) {
@@ -121,7 +120,7 @@ export function PngExportModal({ svgResult, onClose }: PngExportModalProps) {
         URL.revokeObjectURL(nextPreviewUrl);
       }
     };
-  }, [effectiveDpi, svgResult, transparentBackground]);
+  }, [effectiveDpi, svgResult, transparentBackground, fileName]);
 
   useEffect(() => {
     if (!(preview.status === "loading" && preview.previousUrl)) {
@@ -145,7 +144,7 @@ export function PngExportModal({ svgResult, onClose }: PngExportModalProps) {
       const exported = await exportPngDownload(svgResult, {
         dpi: effectiveDpi,
         transparentBackground,
-        fileName: DEFAULT_FILE_NAME
+        fileName
       });
       if (exported) {
         onClose();

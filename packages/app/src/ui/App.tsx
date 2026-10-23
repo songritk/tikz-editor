@@ -366,8 +366,8 @@ function EditorApp() {
     fileRef: DocumentFileRef | null;
     buildKey: string;
   } | null>(null);
-  const [svgExportSvgResult, setSvgExportSvgResult] = useState<EmitSvgResult | null>(null);
-  const [pngExportSvgResult, setPngExportSvgResult] = useState<EmitSvgResult | null>(null);
+  const [svgExport, setSvgExport] = useState<{ svgResult: EmitSvgResult; fileName: string } | null>(null);
+  const [pngExport, setPngExport] = useState<{ svgResult: EmitSvgResult; fileName: string } | null>(null);
   const [pendingAutoFit, setPendingAutoFit] = useState(false);
   const [pendingClose, setPendingClose] = useState<{
     intent: CloseIntent;
@@ -492,11 +492,11 @@ function EditorApp() {
   const handleOpenFromArxivCommand = useCallback(() => {
     setShowOpenFromArxivModal(true);
   }, []);
-  const handleOpenSvgExportCommand = useCallback((svgResult: EmitSvgResult) => {
-    setSvgExportSvgResult(svgResult);
+  const handleOpenSvgExportCommand = useCallback((svgResult: EmitSvgResult, fileName: string) => {
+    setSvgExport({ svgResult, fileName });
   }, []);
-  const handleOpenPngExportCommand = useCallback((svgResult: EmitSvgResult) => {
-    setPngExportSvgResult(svgResult);
+  const handleOpenPngExportCommand = useCallback((svgResult: EmitSvgResult, fileName: string) => {
+    setPngExport({ svgResult, fileName });
   }, []);
   const handleShowCompiledPictureCommand = useCallback(() => {
     setCompiledPictureSource({
@@ -2288,19 +2288,21 @@ function EditorApp() {
           />
         </Suspense>
       ) : null}
-      {svgExportSvgResult ? (
+      {svgExport ? (
         <Suspense fallback={null}>
           <SvgExportModal
-            svgResult={svgExportSvgResult}
-            onClose={() => { setSvgExportSvgResult(null); }}
+            svgResult={svgExport.svgResult}
+            fileName={svgExport.fileName}
+            onClose={() => { setSvgExport(null); }}
           />
         </Suspense>
       ) : null}
-      {pngExportSvgResult ? (
+      {pngExport ? (
         <Suspense fallback={null}>
           <PngExportModal
-            svgResult={pngExportSvgResult}
-            onClose={() => { setPngExportSvgResult(null); }}
+            svgResult={pngExport.svgResult}
+            fileName={pngExport.fileName}
+            onClose={() => { setPngExport(null); }}
           />
         </Suspense>
       ) : null}

@@ -137,7 +137,7 @@ describe("export modal completion contract", () => {
         document.body.appendChild(host);
         root = createRoot(host);
         await act(async () => {
-          root!.render(createElement(component, { svgResult: svg, onClose }));
+          root!.render(createElement(component, { svgResult: svg, fileName: `figure.${name}`, onClose }));
           await new Promise((resolve) => setTimeout(resolve, 0));
         });
         const button = host.querySelector<HTMLButtonElement>(`[data-testid="${name}-export-download"]`)!;

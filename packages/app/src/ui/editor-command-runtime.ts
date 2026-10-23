@@ -6,6 +6,7 @@ import type { DocumentKind } from "@tikz-editor/core/document/kind";
 import { parseDocumentRootId } from "@tikz-editor/core/document/root-id";
 import { APP_MENU_COMMAND_IDS, type AppMenuCommandId } from "../app-menu";
 import { getDockLayoutHandle } from "./DockLayout";
+import { exportFileName } from "./export-file-name";
 import { resolvePropertyTarget } from "@tikz-editor/core/edit/property-target";
 import type { EmitSvgResult } from "@tikz-editor/core/svg/index";
 import type { SessionSnapshot } from "../compute";
@@ -129,8 +130,8 @@ type RuntimeInput = {
   getState?: () => Pick<EditorState, "documents" | "activeDocumentId">;
   onOpenExample?: () => void;
   onOpenFromArxiv?: () => void;
-  onOpenSvgExport?: (svgResult: EmitSvgResult) => void;
-  onOpenPngExport?: (svgResult: EmitSvgResult) => void;
+  onOpenSvgExport?: (svgResult: EmitSvgResult, fileName: string) => void;
+  onOpenPngExport?: (svgResult: EmitSvgResult, fileName: string) => void;
   onRequestCloseDocument?: (documentId: string) => void;
   onRequestCloseAllDocuments?: () => void;
   onRequestQuitApp?: () => void;
@@ -286,7 +287,7 @@ export function createEditorCommandRuntime(input: RuntimeInput): EditorCommandRu
     if (!snapshot.svg) {
       return;
     }
-    onOpenSvgExport?.(snapshot.svg);
+    onOpenSvgExport?.(snapshot.svg, exportFileName(fileRef, "svg"));
   };
 
   const runSvgCopy = () => {
@@ -298,14 +299,14 @@ export function createEditorCommandRuntime(input: RuntimeInput): EditorCommandRu
   const runPdfDownload = () => {
     const svg = snapshot.svg;
     if (!svg) return;
-    void import("./export-commands").then((mod) => mod.exportPdfDownload(svg, { fileName: "tikz-export.pdf" }));
+    void import("./export-commands").then((mod) => mod.exportPdfDownload(svg, { fileName: exportFileName(fileRef, "pdf") }));
   };
 
   const runPngExport = () => {
     if (!snapshot.svg) {
       return;
     }
-    onOpenPngExport?.(snapshot.svg);
+    onOpenPngExport?.(snapshot.svg, exportFileName(fileRef, "png"));
   };
 
   const runStandaloneLatexDownload = () => {
@@ -313,7 +314,7 @@ export function createEditorCommandRuntime(input: RuntimeInput): EditorCommandRu
       return;
     }
     void import("./export-commands").then((mod) => mod.exportStandaloneLatexDownload(source, activeRootId, {
-      fileName: "tikz-export.tex"
+      fileName: exportFileName(fileRef, "tex")
     }));
   };
 
@@ -1145,8 +1146,8 @@ export function useEditorCommandRuntime(
     onPresentationOptions?: () => void;
     onOpenExample?: () => void;
     onOpenFromArxiv?: () => void;
-    onOpenSvgExport?: (svgResult: EmitSvgResult) => void;
-    onOpenPngExport?: (svgResult: EmitSvgResult) => void;
+    onOpenSvgExport?: (svgResult: EmitSvgResult, fileName: string) => void;
+    onOpenPngExport?: (svgResult: EmitSvgResult, fileName: string) => void;
     onRequestCloseDocument?: (documentId: string) => void;
     onRequestCloseAllDocuments?: () => void;
     onRequestQuitApp?: () => void;

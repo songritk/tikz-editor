@@ -1142,7 +1142,29 @@ describe("editor-command-runtime", () => {
 
     expect(ran).toBe(true);
     expect(onOpenSvgExport).toHaveBeenCalledTimes(1);
-    expect(onOpenSvgExport).toHaveBeenCalledWith(rendered.svg);
+    expect(onOpenSvgExport).toHaveBeenCalledWith(rendered.svg, "tikz-export.svg");
+  });
+
+  it("passes the active document's file name to SVG and PNG export", () => {
+    const onOpenSvgExport = vi.fn();
+    const onOpenPngExport = vi.fn();
+    const rendered = renderTikzToSvg(SOURCE);
+    const input = makeInput({
+      dispatch: vi.fn(),
+      snapshot: makeSnapshot(rendered),
+      selectedElementIds: new Set(),
+      onOpenSvgExport,
+      onOpenPngExport
+    });
+    const runtime = createEditorCommandRuntime({
+      ...input,
+      fileRef: { kind: "file", name: "w5-1-amdv.tex" }
+    });
+
+    runtime.runCommand(APP_MENU_COMMAND_IDS.EXPORT_SVG_DOWNLOAD, "menu");
+    runtime.runCommand(APP_MENU_COMMAND_IDS.EXPORT_PNG_DOWNLOAD, "menu");
+    expect(onOpenSvgExport).toHaveBeenCalledWith(rendered.svg, "w5-1-amdv.svg");
+    expect(onOpenPngExport).toHaveBeenCalledWith(rendered.svg, "w5-1-amdv.png");
   });
 
   it("shows a warning when menu paste cannot read system clipboard", async () => {

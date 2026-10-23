@@ -12,15 +12,12 @@ import {
 import { Modal } from "./Modal";
 import css from "./SvgExportModal.module.css";
 
-const DEFAULT_FILE_NAME = "tikz-export.svg";
 const SVG_CODE_EDITOR_ARIA_LABEL = "SVG code";
 
 const SvgCodeEditor = lazy(async () => {
   const mod = await import("./SvgCodeEditor");
   return { default: mod.SvgCodeEditor };
 });
-
-let rememberedFileName = DEFAULT_FILE_NAME;
 
 type OptimizerState =
   | { status: "loading" }
@@ -29,11 +26,12 @@ type OptimizerState =
 
 type SvgExportModalProps = {
   svgResult: EmitSvgResult;
+  fileName: string;
   onClose: () => void;
 };
 
-export function SvgExportModal({ svgResult, onClose }: SvgExportModalProps) {
-  const [fileName, setFileName] = useState(rememberedFileName);
+export function SvgExportModal({ svgResult, fileName: initialFileName, onClose }: SvgExportModalProps) {
+  const [fileName, setFileName] = useState(initialFileName);
   const [markup, setMarkup] = useState("");
   const [baselineMarkup, setBaselineMarkup] = useState("");
   const [loadingMarkup, setLoadingMarkup] = useState(true);
@@ -43,10 +41,6 @@ export function SvgExportModal({ svgResult, onClose }: SvgExportModalProps) {
   const [copyPending, setCopyPending] = useState(false);
   const [downloadPending, setDownloadPending] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState<string | null>(null);
-
-  useEffect(() => {
-    rememberedFileName = fileName;
-  }, [fileName]);
 
   useEffect(() => {
     let active = true;
